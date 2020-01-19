@@ -1,12 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"time"
 )
 
 func main() {
+	timeLimit := flag.Int("TimeLimit", 30, "The time limit of each decision round.")
+	flag.Parse()
+
 	var x int
 
 	fmt.Println("\nWelcome to the Go Or No Go, what would you like to do?")
@@ -34,7 +38,7 @@ func main() {
 		for i := 0; i < len(box); i++ {
 			Value[box[i]] = Prize[order[i]]
 		}
-		
+
 		//user's selection of boxes
 		var lucky1 int
 		var luckybox int
@@ -73,7 +77,6 @@ func main() {
 				//drop the value from the prize list
 				Prize[order[select1-1]] = 0
 
-
 				//remain number of boxes function
 				var remain int
 				for k := 0; k < len(box); k++ {
@@ -99,37 +102,55 @@ func main() {
 
 				//banker's offer
 				var risk float32 = 0.8
-				offer := float32(pool) / (float32(remain+1)) * risk
+				offer := float32(pool) / (float32(remain + 1)) * risk
 
 				fmt.Println("\nThe banker is offering to buy your lucky box, if you take the offer, the game will end and you can go with the price. Or you can reject the offer and continue the game")
+				fmt.Println("You have 30 seconds to make your decision, after 30 seconds, the game is over and your final prize is the value inside your lucky box")
 				fmt.Println("\nBanker's offer: ", int32(offer))
 
-				//show hidden value
-				//fmt.Println(order)
-				// fmt.Println(Value)
-				// fmt.Println(luckybox)
-				// fmt.Println(pool)
-				//fmt.Println(Value)
+				//Decision time, 30 sec. Start to counter right after the offer is given:
+				roundTime := time.NewTimer(time.Duration(*timeLimit) * time.Second)
 
-				//handle player's choice
-				var y int
-				fmt.Println("\n1: Continue the game\t 2: Take the money and Go")
-				fmt.Scanln(&y)
+				for i := 0; i < 1; i++ {
+					//handle player's choice
+					//var decision int
+					fmt.Println("\n1: Continue the game\t 2: Take the money and Go")
+					decisionCh := make(chan int)
 
-				if remain == 0 {
-					fmt.Println("All the remaining boxese are gone, you can now go with you luckybox")
-					fmt.Println("\nHere is your luckybox's value!: ", luckybox)
-					break
+					go func() {
+						var decision int
+						fmt.Scanln(&decision)
+						decisionCh <- decision
+					}()
 
-				} else if y == 1 {
+					select {
+					//If the player consider over 30 seconds, the game is over and player leave with the luckybox
+					//Receive time out signal from roundTime channel first.
+					case <-roundTime.C:
+						fmt.Println("Ops, your decisioin time ran out, you are now leaving with your lucky box")
+						fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
+						return
 
-				} else if y == 2 {
-					fmt.Println("\nAccepted banker's offer, here is the prize you earned: ", int(offer))
-					fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
-					break
-				} //else if y == selection pool array {
-				// fmt.Println("Please select the box numbers inside the pool")
-				//}
+					//The player make his decision on time, the game continue.
+					//Receive decision from decisionCh channel first.
+					case decision := <-decisionCh:
+						if remain == 0 {
+							fmt.Println("All the remaining boxese are gone, you can now go with you luckybox")
+							fmt.Println("\nHere is your luckybox's value!: ", luckybox)
+							return
+
+						} else if decision == 1 {
+							break
+
+						} else if decision == 2 {
+							fmt.Println("\nAccepted banker's offer, here is the prize you earned: ", int(offer))
+							fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
+							return
+
+						}
+
+					}
+				}
 			}
 		}
 	} else if x == 2 {
