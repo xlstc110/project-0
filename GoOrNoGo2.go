@@ -128,7 +128,7 @@ func main() {
 					//Receive time out signal from roundTime channel first.
 					case <-roundTime.C:
 						fmt.Println("Ops, your decisioin time ran out, you are now leaving with your lucky box")
-						fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
+						LuckyBox(luckybox)
 						return
 
 					//The player make his decision on time, the game continue.
@@ -136,7 +136,8 @@ func main() {
 					case decision := <-decisionCh:
 						if remain == 0 {
 							fmt.Println("All the remaining boxese are gone, you can now go with you luckybox")
-							fmt.Println("\nHere is your luckybox's value!: ", luckybox)
+							LuckyBox(luckybox)
+							// currentScore := &Player{Name: name, Score: )}
 							return
 
 						} else if decision == 1 {
@@ -144,7 +145,7 @@ func main() {
 
 						} else if decision == 2 {
 							fmt.Println("\nAccepted banker's offer, here is the prize you earned: ", int(offer))
-							fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
+							LuckyBox(luckybox)
 							return
 
 						}
@@ -161,6 +162,10 @@ func main() {
 
 }
 
+func LuckyBox(luckybox int) {
+	fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
+}
+
 func Find(drop []int, select1 int) bool {
 	for _, picked := range drop {
 		if picked == select1 {
@@ -169,3 +174,22 @@ func Find(drop []int, select1 int) bool {
 	}
 	return false
 }
+
+// type Player struct {
+// 	Name  string
+// 	Score []byte
+// }
+
+// func (p *Player) save() error {
+// 	filename := p.Name + ".txt"
+// 	return ioutil.WriteFile(filename, p.Score, 0600)
+// }
+
+// func load(name string) (*Player, error) {
+// 	filename := name + ".txt"
+// 	score, err := ioutil.ReadFile(filename)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &Player{Name: name, Score: score}, nil
+// }
