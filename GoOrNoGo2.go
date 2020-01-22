@@ -139,7 +139,7 @@ func main() {
 						if remain == 0 {
 							fmt.Println("All the remaining boxese are gone, you can now go with you luckybox")
 							luckyBox(luckybox)
-							// currentScore := &Player{Name: name, Score: )}
+							record(decision, offer, luckybox)
 							return
 
 						} else if decision == 1 {
@@ -162,6 +162,8 @@ func main() {
 
 	} else {
 		fmt.Println("Please make a selection between 1 and 2")
+		fmt.Scanln(&x)
+		return
 	}
 
 }
@@ -204,7 +206,7 @@ func record(decision int, offer int, luckybox int) {
 			player1 := &player{Name: b, Score: []byte(strconv.Itoa(luckybox))}
 			player1.save()
 		}
-		fmt.Println("You nick and score has recorded to the file!")
+		fmt.Println("You nick name and score has recorded to the file!")
 
 	} else {
 		return
