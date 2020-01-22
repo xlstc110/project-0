@@ -19,7 +19,7 @@ Gaming phrase:
 
 8. If player choose to take the offer, offer will be the final score of the player.
 
-9. If player choose to continue the game, the picking stage will start again.
+9. If player choose to continue the game, the picking stage will start again, until the player take offer or all the boxes are gone.
 
 10.If player continue the game until there is no box inside the pool, then the prize inside their "luckybox" will be their final score.
 
