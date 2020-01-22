@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -13,8 +15,8 @@ func main() {
 
 	var x int
 
-	fmt.Println("\nWelcome to the Go Or No Go, what would you like to do?")
-	fmt.Println("\n1: Play go or no go\t 2: Check the scoreboard\n")
+	fmt.Println("Welcome to the Go Or No Go, what would you like to do?")
+	fmt.Println("1: Play go or no go\t 2: Check the scoreboard")
 	fmt.Scanln(&x)
 
 	if x == 1 {
@@ -22,7 +24,7 @@ func main() {
 		box := []string{
 			"box 1", "box 2", "box 3", "box 4", "box 5", "box 6", "box 7", "box 8", "box 9", "box 10",
 		}
-		fmt.Println(box, "\n")
+		fmt.Println(box)
 
 		//generate a random nonrepeated array to mix the order the box value.
 		rand.Seed(time.Now().UnixNano())
@@ -59,13 +61,13 @@ func main() {
 			fmt.Println(box)
 			//start to select the boxes to be dropped
 			var select1 int
-			fmt.Println("\nplease select your next box to be dropped\n")
+			fmt.Println("please select your next box to be dropped")
 			fmt.Scanln(&select1)
 
 			//check if the box has been selected before.
-			found := Find(picked, select1)
+			found := find(picked, select1)
 			if found {
-				fmt.Println("Pleast do not select the box that has not been dropped.\n")
+				fmt.Println("Pleast do not select the box that has not been dropped.")
 			} else {
 
 				//add the dropped box into the trashcan slice
@@ -85,7 +87,7 @@ func main() {
 					}
 				}
 
-				fmt.Println("\nHere is the remaining boxes: \n")
+				fmt.Println("Here is the remaining boxes: ")
 				fmt.Println(box)
 
 				//total prize pool
@@ -97,12 +99,12 @@ func main() {
 				}
 
 				//show the remaining prize list
-				fmt.Println("\nHere is the total prize pool: \n")
+				fmt.Println("Here is the total prize pool: ")
 				fmt.Println(Prize)
 
 				//banker's offer
-				var risk float32 = 0.8
-				offer := float32(pool) / (float32(remain + 1)) * risk
+				var risk float32 = 0.9
+				offer := int(float32(pool) / (float32(remain + 1)) * risk)
 
 				fmt.Println("\nThe banker is offering to buy your lucky box, if you take the offer, the game will end and you can go with the price. Or you can reject the offer and continue the game")
 				fmt.Println("You have 30 seconds to make your decision, after 30 seconds, the game is over and your final prize is the value inside your lucky box")
@@ -128,7 +130,7 @@ func main() {
 					//Receive time out signal from roundTime channel first.
 					case <-roundTime.C:
 						fmt.Println("Ops, your decisioin time ran out, you are now leaving with your lucky box")
-						LuckyBox(luckybox)
+						luckyBox(luckybox)
 						return
 
 					//The player make his decision on time, the game continue.
@@ -136,7 +138,7 @@ func main() {
 					case decision := <-decisionCh:
 						if remain == 0 {
 							fmt.Println("All the remaining boxese are gone, you can now go with you luckybox")
-							LuckyBox(luckybox)
+							luckyBox(luckybox)
 							// currentScore := &Player{Name: name, Score: )}
 							return
 
@@ -144,8 +146,9 @@ func main() {
 							break
 
 						} else if decision == 2 {
-							fmt.Println("\nAccepted banker's offer, here is the prize you earned: ", int(offer))
-							LuckyBox(luckybox)
+							fmt.Println("Accepted banker's offer, here is the prize you earned: ", offer)
+							luckyBox(luckybox)
+							record(decision, offer, luckybox)
 							return
 
 						}
@@ -155,18 +158,21 @@ func main() {
 			}
 		}
 	} else if x == 2 {
-		fmt.Println("Ops, the scoreboard is empty for now, bye~")
+		ScoreCheck()
+
 	} else {
 		fmt.Println("Please make a selection between 1 and 2")
 	}
 
 }
 
-func LuckyBox(luckybox int) {
-	fmt.Println("\nHere is the prize inside your luckybox: ", luckybox)
+//reusable ending quote, to show the value inside the "luckybox"
+func luckyBox(luckybox int) {
+	fmt.Println("Here is the prize inside your luckybox: ", luckybox)
 }
 
-func Find(drop []int, select1 int) bool {
+//func find will loop through the slice and check if the number has previously picked and return a boolean result.
+func find(drop []int, select1 int) bool {
 	for _, picked := range drop {
 		if picked == select1 {
 			return true
@@ -175,21 +181,61 @@ func Find(drop []int, select1 int) bool {
 	return false
 }
 
-// type Player struct {
-// 	Name  string
-// 	Score []byte
-// }
+type player struct {
+	Name  string
+	Score []byte
+}
 
-// func (p *Player) save() error {
-// 	filename := p.Name + ".txt"
-// 	return ioutil.WriteFile(filename, p.Score, 0600)
-// }
+//func record creates a file that has player's nick name and score.
+func record(decision int, offer int, luckybox int) {
+	var a int
+	fmt.Println("Would you like to save your score under a nick name? enter 1 for yes, or any other number to stay annoymous")
+	fmt.Scanln(&a)
+	if a == 1 {
 
-// func load(name string) (*Player, error) {
-// 	filename := name + ".txt"
-// 	score, err := ioutil.ReadFile(filename)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &Player{Name: name, Score: score}, nil
-// }
+		var b string
+		fmt.Println("Please type your nick name: ")
+		fmt.Scanln(&b)
+
+		if decision == 2 {
+			player1 := &player{Name: b, Score: []byte(strconv.Itoa(offer))}
+			player1.save()
+		} else {
+			player1 := &player{Name: b, Score: []byte(strconv.Itoa(luckybox))}
+			player1.save()
+		}
+		fmt.Println("You nick and score has recorded to the file!")
+
+	} else {
+		return
+	}
+}
+
+func (p *player) save() error {
+	filename := p.Name + ".txt"
+	return ioutil.WriteFile(filename, p.Score, 0600)
+}
+
+//func load takes a name and read the content into variable "score"
+func load(name string) (*player, error) {
+	filename := name + ".txt"
+	score, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &player{Name: name, Score: score}, nil
+}
+
+//func scorecheck() will take the user's input of player name and call func load() to display the result.
+func ScoreCheck() {
+	var name string
+	fmt.Println("Please enter the name you would like to check: ")
+	fmt.Scanln(&name)
+	player, err := load(name)
+	if err != nil {
+		fmt.Println("There is no such player or the system is having problem")
+		return
+	}
+	fmt.Println("Here is the record for: ", name)
+	fmt.Println((string(player.Score)))
+}
