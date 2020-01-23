@@ -1,11 +1,12 @@
-2020/01/23 06:07:02 main(): menu.
-2020/01/23 06:07:03 Game started: lucky box stage.
-2020/01/23 06:07:04 Game phrase: picking box to drop
-2020/01/23 06:07:04 Game phrase: drop box from the pool and calculate the offer.
-2020/01/23 06:07:04 Game phrase: waiting for player's decision
-2020/01/23 06:07:07 Game phrase: picking box to drop
-2020/01/23 06:07:08 Game phrase: drop box from the pool and calculate the offer.
-2020/01/23 06:07:08 Game phrase: waiting for player's decision
-2020/01/23 06:07:08 Game phrase: player accepted the offer, game over and open the lucky box.
-2020/01/23 06:07:08 Record stage: if the player wants to save his record.
-2020/01/23 06:07:11 Record stage: player type the nick name to be saved.
+2020/01/23 08:41:48 main(): menu.
+2020/01/23 08:41:49 Game started: lucky box stage.
+2020/01/23 08:41:55 Game phrase: picking box to drop
+2020/01/23 08:41:56 Game phrase: drop box from the pool and calculate the offer.
+2020/01/23 08:41:56 Game phrase: waiting for player's decision
+2020/01/23 08:42:00 Game phrase: picking box to drop
+2020/01/23 08:42:02 Game phrase: picking box to drop
+2020/01/23 08:42:05 Game phrase: drop box from the pool and calculate the offer.
+2020/01/23 08:42:05 Game phrase: waiting for player's decision
+2020/01/23 08:42:06 Game phrase: player accepted the offer, game over and open the lucky box.
+2020/01/23 08:42:06 Record stage: if the player wants to save his record.
+2020/01/23 08:42:11 Record stage: player type the nick name to be saved.
