@@ -11,71 +11,71 @@ import (
 )
 
 //Server alive for score checking.
-func webPage() {
-	http.HandleFunc("/", mainPageHandler)
-	http.HandleFunc("/result", resultHandler)
+func WebPage() {
+	http.HandleFunc("/", MainPageHandler)
+	http.HandleFunc("/result", ResultHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
 //read content and return *template.Template
-var templates = template.Must(template.ParseFiles("mainpage.html", "result.html"))
+var Template = template.Must(template.ParseFiles("mainpage.html", "result.html"))
 
 //execute template mainpage.html
-func mainPageHandler(w http.ResponseWriter, r *http.Request) {
+func MainPageHandler(w http.ResponseWriter, r *http.Request) {
 
-	templates.ExecuteTemplate(w, "mainpage.html", nil)
+	Template.ExecuteTemplate(w, "mainpage.html", nil)
 }
 
 //handle request and execute template result.html
-func resultHandler(w http.ResponseWriter, r *http.Request) {
+func ResultHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
-	score, err := load(name)
+	score, err := Load(name)
 	if err != nil {
-		score1 := &player{Name: name, Score: []byte("No record for this player")}
+		score1 := &Player{Name: name, Score: []byte("No record for this player")}
 		score = score1
 	}
 
-	templates.ExecuteTemplate(w, "result.html", score)
+	Template.ExecuteTemplate(w, "result.html", score)
 }
 
 //Player did not make a decision in 30 seconds, box stage is over.
 //Show luckybox then create a default decision variable and call record func()
-func timesUp(luckybox int, offer int) {
+func TimesUp(luckybox int, offer int) {
 	log.Println("Game phrase: player's time up, game over and open the lucky box as final prize.")
 
 	fmt.Println("Ops, your decisioin time ran out, you are now leaving with your lucky box")
-	luckyBox(luckybox)
+	LuckyBox(luckybox)
 	decision := 0
-	record(decision, offer, luckybox)
+	Record(decision, offer, luckybox)
 }
 
 //Player accepted offer, box stage is over
 //Show luckybox then call record func()
-func acceptOffer(luckybox int, decision int, offer int) {
+func AcceptOffer(luckybox int, decision int, offer int) {
 	log.Println("Game phrase: player accepted the offer, game over and open the lucky box.")
 
 	fmt.Println("Accepted banker's offer, here is the prize you earned: ", offer)
-	luckyBox(luckybox)
-	record(decision, offer, luckybox)
+	LuckyBox(luckybox)
+	Record(decision, offer, luckybox)
 }
 
 //All boxes are picked, box stage is over
 //Show luckybox then call record func()
-func boxGone(luckybox int, decision int, offer int) {
+func BoxGone(luckybox int, decision int, offer int) {
 	log.Println("Game phrase: all the boxes on stage is gone, game over and open the lucky box.")
 
 	fmt.Println("All the staging boxes are gone, you can now go with you luckybox")
-	luckyBox(luckybox)
-	record(decision, offer, luckybox)
+	LuckyBox(luckybox)
+	Record(decision, offer, luckybox)
 }
 
 //reusable ending quote, to show the value inside the "luckybox"
-func luckyBox(luckybox int) {
+func LuckyBox(luckybox int) {
 	fmt.Println("Here is the prize inside your luckybox: ", luckybox)
 }
 
 //func find loop through the slice and check if the number has previously picked and return a boolean result.
-func find(drop []int, select1 int) bool {
+func Find(drop []int, select1 int) bool {
 
 	for _, picked := range drop {
 		if picked == select1 {
@@ -85,13 +85,13 @@ func find(drop []int, select1 int) bool {
 	return false
 }
 
-type player struct {
+type Player struct {
 	Name  string
 	Score []byte
 }
 
 //func record creates a file that has player's nick name and score.
-func record(decision int, offer int, luckybox int) {
+func Record(decision int, offer int, luckybox int) {
 	log.Println("Record stage: if the player wants to save his record.")
 
 	var a int
@@ -105,11 +105,11 @@ func record(decision int, offer int, luckybox int) {
 		fmt.Scanln(&b)
 
 		if decision == 2 {
-			player1 := &player{Name: b, Score: []byte(strconv.Itoa(offer))}
-			player1.save()
+			player1 := &Player{Name: b, Score: []byte(strconv.Itoa(offer))}
+			player1.Save()
 		} else {
-			player1 := &player{Name: b, Score: []byte(strconv.Itoa(luckybox))}
-			player1.save()
+			player1 := &Player{Name: b, Score: []byte(strconv.Itoa(luckybox))}
+			player1.Save()
 		}
 		fmt.Println("You nick name and score has recorded to the file!")
 		fmt.Println("You can check your or other's record on the site http://localhost:8080/ or in main menu!")
@@ -121,19 +121,19 @@ func record(decision int, offer int, luckybox int) {
 }
 
 //func save create a txt file that has player's name and score
-func (p *player) save() error {
+func (p *Player) Save() error {
 	filename := p.Name + ".txt"
 	return ioutil.WriteFile(filename, p.Score, 0600)
 }
 
 //func load takes a name and read the content into variable "score"
-func load(name string) (*player, error) {
+func Load(name string) (*Player, error) {
 	filename := name + ".txt"
 	score, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	return &player{Name: name, Score: score}, nil
+	return &Player{Name: name, Score: score}, nil
 }
 
 //ScoreCheck will take the user's input of player name and call func load() to display the result.
@@ -142,7 +142,7 @@ func ScoreCheck() {
 	var name string
 	fmt.Println("Please enter the name you would like to check: ")
 	fmt.Scanln(&name)
-	player, err := load(name)
+	player, err := Load(name)
 	if err != nil {
 		fmt.Println("There is record for this player")
 		return
